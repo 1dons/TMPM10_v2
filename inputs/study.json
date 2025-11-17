@@ -1,0 +1,85 @@
+{
+  "study_name": "impact_parametric",
+  "units": "mm-s-ton-MPa",
+  
+  "parameters": {
+    "ply_angles": {
+      "values": [
+        [0,90,45,-45]
+      ],
+      "description": "Layup sequences to test"
+    },
+    
+    "ply_thk": {
+      "values": [0.4],
+      "description": "Ply thicknesses in mm"
+    },
+    
+    "material": {
+      "values": ["MatA"],
+      "description": "Material to use"
+    },
+    
+    "imp_speed": {
+      "values": [3130],
+      "description": "Impact speed in mm/s"
+    },
+    
+    "width": {
+      "values": [100],
+      "description": "Plate width (single value = constant)"
+    },
+    
+    "length": {
+      "values": [50],
+      "description": "Plate length"
+    },
+    
+    "coh_thk": {
+      "values": [1],
+      "description": "Cohesive layer thicknesses"
+    },
+    
+    "imp_radius": {
+      "values": [7.5],
+      "description": "Impactor radius"
+    },
+    
+    "imp_mass_kg": {
+      "values": [0.00614],
+      "description": "Impactor mass in kg"
+    }
+  },
+  
+  "materials": {
+    "MatA": {
+      "E1": 140000.0, "E2": 10000.0, "E3": 10000.0,
+      "NU12": 0.3, "NU13": 0.3, "NU23": 0.5,
+      "G12": 5200.0, "G13": 5200.0, "G23": 3900.0,
+      "rho_lam": 1.0e-6,
+      "En": 10000.0, "G1": 5000.0, "G2": 5000.0,
+      "N": 20.0, "S1": 40.0, "S2": 40.0, "eta": 1.45,
+      "GIc": 0.259, "GIIc": 0.8, "GIIIc": 0.8,
+      "rho_coh": 1.2e-9
+    },
+    
+    "MatB": {
+      "E1": 130000.0, "E2": 9000.0, "E3": 9000.0,
+      "NU12": 0.28, "NU13": 0.28, "NU23": 0.45,
+      "G12": 5000.0, "G13": 5000.0, "G23": 3700.0,
+      "rho_lam": 1.1e-9,
+      "En": 9000.0, "G1": 4500.0, "G2": 4500.0,
+      "N": 18.0, "S1": 38.0, "S2": 38.0, "eta": 1.4,
+      "GIc": 0.25, "GIIc": 0.75, "GIIIc": 0.75,
+      "rho_coh": 1.1e-9
+    }
+  },
+  
+  "simulation": {
+    "time": 0.02,
+    "mesh_refined": 1,
+    "mesh_coarse": 5,
+    "coarse_scale": 2,
+    "num_output_intervals": 250
+  }
+}

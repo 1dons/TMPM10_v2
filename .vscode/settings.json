@@ -1,0 +1,8 @@
+{
+  "python.defaultInterpreterPath": ".python/python.exe",
+  "python.analysis.extraPaths": [
+    ".python/.python_packages"
+  ],
+  "python-envs.defaultEnvManager": "ms-python.python:system",
+  "python-envs.pythonProjects": []
+}

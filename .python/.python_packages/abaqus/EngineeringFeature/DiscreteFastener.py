@@ -1,0 +1,203 @@
+from __future__ import annotations
+
+from typing import Union
+
+from typing_extensions import Literal
+
+from abqpy.decorators import abaqus_class_doc, abaqus_method_doc
+
+from ..Region.Region import Region
+from ..UtilityAndView.abaqusConstants import (
+    CONTINUUM,
+    OFF,
+    ON,
+    UNIFORM,
+    Boolean,
+    SymbolicConstant,
+)
+from ..UtilityAndView.abaqusConstants import abaqusConstants as C
+from .Fastener import Fastener
+
+
+@abaqus_class_doc
+class DiscreteFastener(Fastener):
+    """The DiscreteFastener object defines a discrete fastener. The DiscreteFastener object is derived from the
+    Fastener object.
+
+    .. note::
+        This object can be accessed by::
+
+            import part
+            mdb.models[name].parts[name].engineeringFeatures.fasteners[name]
+            import assembly
+            mdb.models[name].rootAssembly.engineeringFeatures.fasteners[name]
+
+        The corresponding analysis keywords are:
+
+        - COUPLING
+    """
+
+    #: A Boolean specifying whether the fastener is suppressed or not. The default value is
+    #: OFF.
+    suppressed: Boolean = OFF
+
+    #: A String specifying the repository key.
+    name: str
+
+    #: A Region object specifying the region to which the fastener is applied.
+    region: Region
+
+    #: The SymbolicConstant WHOLE_SURFACE or a Float specifying the coupling influence radius.
+    influenceRadius: Union[SymbolicConstant, float]
+
+    #: A Boolean specifying whether to constrain rotational displacement component about the
+    #: 1-direction. The default value is ON.
+    ur1: Boolean = ON
+
+    #: A Boolean specifying whether to constrain rotational displacement component about the
+    #: 2-direction. The default value is ON.
+    ur2: Boolean = ON
+
+    #: A Boolean specifying whether to constrain rotational displacement component about the
+    #: 3-direction. The default value is ON.
+    ur3: Boolean = ON
+
+    #: A SymbolicConstant specifying the coupling method used to couple the displacement and
+    #: rotation of each attachment point to the average motion of the surface nodes within the
+    #: radius of influence from the fastening point. Possible values are CONTINUUM and
+    #: STRUCTURAL. The default value is CONTINUUM.
+    coupling: SymbolicConstant = CONTINUUM
+
+    #: A SymbolicConstant specifying the weighting scheme to be used to weight the contribution
+    #: of the displacements of the surface nodes within the radius of influence to the motion
+    #: of the fastening point. UNIFORM, LINEAR, QUADRATIC, and CUBIC indicate uniform, linear
+    #: decreasing, quadratic polynomial decreasing, and cubic polynomial monotonic decreasing
+    #: weight distributions. Possible values are UNIFORM, LINEAR, QUADRATIC, and CUBIC. The
+    #: default value is UNIFORM.
+    weightingMethod: Literal[C.QUADRATIC, C.UNIFORM, C.CUBIC, C.LINEAR] = UNIFORM
+
+    #: None or a DatumCsys object specifying the local coordinate system of fastener couplings.
+    #: If **localCsys** = None, couplings are defined in the global coordinate system. When this
+    #: member is queried, it returns an Int. The default value is None.
+    localCsys: int | None = None
+
+    @abaqus_method_doc
+    def __init__(
+        self,
+        name: str,
+        region: Region,
+        influenceRadius: Union[Literal[C.WHOLE_SURFACE], float],
+        ur1: Boolean = ON,
+        ur2: Boolean = ON,
+        ur3: Boolean = ON,
+        coupling: Literal[C.STRUCTURAL, C.CONTINUUM] = CONTINUUM,
+        rotationalCoupling: Literal[C.ROTATIONAL_CONTINUUM, C.ROTATIONAL_STRUCTURAL] = C.ROTATIONAL_STRUCTURAL,
+        weightingMethod: Literal[C.QUADRATIC, C.UNIFORM, C.CUBIC, C.LINEAR] = UNIFORM,
+        localCsys: int | None = None,
+    ):
+        """This method creates a DiscreteFastener object. Although the constructor is available both for parts
+        and for the assembly, DiscreteFastener objects are currently supported only under the assembly.
+
+        .. note::
+            This function can be accessed by::
+
+                mdb.models[name].parts[name].engineeringFeatures.DiscreteFastener
+                mdb.models[name].rootAssembly.engineeringFeatures.DiscreteFastener
+
+        Parameters
+        ----------
+        name
+            A String specifying the repository key.
+        region
+            A Region object specifying the region to which the fastener is applied.
+        influenceRadius
+            The SymbolicConstant WHOLE_SURFACE or a Float specifying the coupling influence radius.
+        ur1
+            A Boolean specifying whether to constrain rotational displacement component about the
+            1-direction. The default value is ON.
+        ur2
+            A Boolean specifying whether to constrain rotational displacement component about the
+            2-direction. The default value is ON.
+        ur3
+            A Boolean specifying whether to constrain rotational displacement component about the
+            3-direction. The default value is ON.
+        coupling
+            A SymbolicConstant specifying the coupling method used to couple the displacement and
+            rotation of each attachment point to the average motion of the surface nodes within the
+            radius of influence from the fastening point. Possible values are CONTINUUM and
+            STRUCTURAL. The default value is CONTINUUM.
+        rotationalCoupling
+            A SymbolicConstant specifying the rotational coupling method used. Possible values are ROTATIONAL_CONTINUUM
+            and ROTATIONAL_STRUCTURAL. The default value is ROTATIONAL_STRUCTURAL.
+
+            .. versionadded:: 2024
+
+                The argument ``rotationalCoupling`` was added.
+        weightingMethod
+            A SymbolicConstant specifying the weighting scheme to be used to weight the contribution
+            of the displacements of the surface nodes within the radius of influence to the motion
+            of the fastening point. UNIFORM, LINEAR, QUADRATIC, and CUBIC indicate uniform, linear
+            decreasing, quadratic polynomial decreasing, and cubic polynomial monotonic decreasing
+            weight distributions. Possible values are UNIFORM, LINEAR, QUADRATIC, and CUBIC. The
+            default value is UNIFORM.
+        localCsys
+            None or a DatumCsys object specifying the local coordinate system of fastener couplings.
+            If **localCsys** = None, couplings are defined in the global coordinate system. When this
+            member is queried, it returns an Int. The default value is None.
+
+        Returns
+        -------
+        DiscreteFastener
+            A DiscreteFastener object.
+        """
+        super().__init__()
+
+    @abaqus_method_doc
+    def setValues(
+        self,
+        ur1: Boolean = ON,
+        ur2: Boolean = ON,
+        ur3: Boolean = ON,
+        coupling: Literal[C.STRUCTURAL, C.CONTINUUM] = CONTINUUM,
+        rotationalCoupling: Literal[C.ROTATIONAL_CONTINUUM, C.ROTATIONAL_STRUCTURAL] = C.ROTATIONAL_STRUCTURAL,
+        weightingMethod: Literal[C.QUADRATIC, C.UNIFORM, C.CUBIC, C.LINEAR] = UNIFORM,
+        localCsys: int | None = None,
+    ):
+        """This method modifies the DiscreteFastener object.
+
+        Parameters
+        ----------
+        ur1
+            A Boolean specifying whether to constrain rotational displacement component about the
+            1-direction. The default value is ON.
+        ur2
+            A Boolean specifying whether to constrain rotational displacement component about the
+            2-direction. The default value is ON.
+        ur3
+            A Boolean specifying whether to constrain rotational displacement component about the
+            3-direction. The default value is ON.
+        coupling
+            A SymbolicConstant specifying the coupling method used to couple the displacement and
+            rotation of each attachment point to the average motion of the surface nodes within the
+            radius of influence from the fastening point. Possible values are CONTINUUM and
+            STRUCTURAL. The default value is CONTINUUM.
+        rotationalCoupling
+            A SymbolicConstant specifying the rotational coupling method used. Possible values are ROTATIONAL_CONTINUUM
+            and ROTATIONAL_STRUCTURAL. The default value is ROTATIONAL_STRUCTURAL.
+
+            .. versionadded:: 2024
+
+                The argument ``rotationalCoupling`` was added.
+        weightingMethod
+            A SymbolicConstant specifying the weighting scheme to be used to weight the contribution
+            of the displacements of the surface nodes within the radius of influence to the motion
+            of the fastening point. UNIFORM, LINEAR, QUADRATIC, and CUBIC indicate uniform, linear
+            decreasing, quadratic polynomial decreasing, and cubic polynomial monotonic decreasing
+            weight distributions. Possible values are UNIFORM, LINEAR, QUADRATIC, and CUBIC. The
+            default value is UNIFORM.
+        localCsys
+            None or a DatumCsys object specifying the local coordinate system of fastener couplings.
+            If **localCsys** = None, couplings are defined in the global coordinate system. When this
+            member is queried, it returns an Int. The default value is None.
+        """
+        ...

@@ -1,0 +1,370 @@
+from __future__ import annotations
+
+from typing_extensions import Literal
+
+from abqpy.decorators import abaqus_class_doc, abaqus_method_doc
+
+from ..Adaptivity.AdaptiveMeshConstraintState import AdaptiveMeshConstraintState
+from ..Adaptivity.AdaptiveMeshDomain import AdaptiveMeshDomain
+from ..BoundaryCondition.BoundaryConditionState import BoundaryConditionState
+from ..Load.LoadCase import LoadCase
+from ..Load.LoadState import LoadState
+from ..PredefinedField.PredefinedFieldState import PredefinedFieldState
+from ..StepMiscellaneous.Control import Control
+from ..StepMiscellaneous.SolverControl import SolverControl
+from ..StepOutput.DiagnosticPrint import DiagnosticPrint
+from ..StepOutput.FieldOutputRequestState import FieldOutputRequestState
+from ..StepOutput.HistoryOutputRequestState import HistoryOutputRequestState
+from ..StepOutput.Monitor import Monitor
+from ..StepOutput.Restart import Restart
+from ..UtilityAndView.abaqusConstants import (
+    AUTOMATIC,
+    DIRECT,
+    FULL_NEWTON,
+    OFF,
+    PROPAGATED,
+    SOLVER_DEFAULT,
+    Boolean,
+    SymbolicConstant,
+)
+from ..UtilityAndView.abaqusConstants import abaqusConstants as C
+from .AnalysisStep import AnalysisStep
+
+
+@abaqus_class_doc
+class GeostaticStep(AnalysisStep):
+    """The GeostaticStep object is used to verify that the geostatic stress field is in equilibrium with the
+    applied loads and boundary conditions on the model and to iterate, if needed, to obtain equilibrium. The
+    GeostaticStep object is derived from the AnalysisStep object.
+
+    .. note::
+        This object can be accessed by::
+
+            import step
+            mdb.models[name].steps[name]
+
+        The corresponding analysis keywords are:
+
+        - GEOSTATIC
+        - STEP
+    """
+
+    #: A String specifying the repository key.
+    name: str = ""
+
+    #: A Boolean specifying whether geometric nonlinearities should be accounted for during the
+    #: step. The default value is OFF.
+    nlgeom: Boolean = OFF
+
+    #: A SymbolicConstant specifying the type of solver. Possible values are DIRECT and
+    #: ITERATIVE. The default value is DIRECT.
+    matrixSolver: SymbolicConstant = DIRECT
+
+    #: A SymbolicConstant specifying the type of matrix storage. Possible values are SYMMETRIC,
+    #: UNSYMMETRIC, and SOLVER_DEFAULT. The default value is SOLVER_DEFAULT.
+    matrixStorage: SymbolicConstant = SOLVER_DEFAULT
+
+    #: A SymbolicConstant specifying the technique used to for solving nonlinear equations.
+    #: Possible values are FULL_NEWTON and QUASI_NEWTON. The default value is FULL_NEWTON.
+    solutionTechnique: SymbolicConstant = FULL_NEWTON
+
+    #: An Int specifying the number of quasi-Newton iterations allowed before the kernel matrix
+    #: is reformed.. The default value is 8.
+    reformKernel: int = 8
+
+    #: A SymbolicConstant specifying whether to force a new iteration if severe discontinuities
+    #: occur during an iteration. Possible values are PROPAGATED, CONVERT_SDI_OFF, and
+    #: CONVERT_SDI_ON. The default value is PROPAGATED.
+    convertSDI: SymbolicConstant = PROPAGATED
+
+    #: None or a Float specifying the tolerance for maximum change of displacements. The
+    #: default value is None.
+    utol: float | None = None
+
+    #: A Float specifying the total time period. The default value is 1.0. Note: This parameter
+    #: is ignored unless **timeIncrementationMethod** = AUTOMATIC.
+    timePeriod: float = 1
+
+    #: A SymbolicConstant specifying the time incrementation method to be used. Possible values
+    #: are FIXED and AUTOMATIC. The default value is AUTOMATIC.
+    timeIncrementationMethod: SymbolicConstant = AUTOMATIC
+
+    #: An Int specifying the maximum number of increments in a step. The default value is 100.
+    #:
+    #: .. versionadded:: 2017
+    #:     The ``maxNumInc`` attribute was added to the GeostaticStep class.
+    maxNumInc: int
+
+    #: A Float specifying the initial time increment. The default value is the total time
+    #: period for the step. Note: This parameter is ignored unless
+    #: **timeIncrementationMethod** = AUTOMATIC.
+    initialInc: float | None = None
+
+    #: A Float specifying the minimum time increment allowed. The default value is the smaller
+    #: of the suggested initial time increment or 10−5 times the total time period. Note: This
+    #: parameter is ignored unless **timeIncrementationMethod** = AUTOMATIC.
+    minInc: float | None = None
+
+    #: A Float specifying the maximum time increment allowed. The default value is the total
+    #: time period for the step. Note: This parameter is ignored unless
+    #: **timeIncrementationMethod** = AUTOMATIC.
+    maxInc: float | None = None
+
+    #: A String specifying the name of the previous step. The new step appears after this step
+    #: in the list of analysis steps.
+    previous: str = ""
+
+    #: A String specifying a description of the new step. The default value is an empty string.
+    description: str = ""
+
+    #: A SymbolicConstant specifying whether the step has an explicit procedure type
+    #: (*procedureType* = ANNEAL, DYNAMIC_EXPLICIT, or DYNAMIC_TEMP_DISPLACEMENT).
+    explicit: SymbolicConstant
+
+    #: A Boolean specifying whether the step has a perturbation procedure type.
+    perturbation: Boolean = OFF
+
+    #: A Boolean specifying whether the step has a mechanical procedure type.
+    nonmechanical: Boolean = OFF
+
+    #: A SymbolicConstant specifying the Abaqus procedure. Possible values are:
+    #:
+    #: - ANNEAL
+    #: - BUCKLE
+    #: - COMPLEX_FREQUENCY
+    #: - COUPLED_TEMP_DISPLACEMENT
+    #: - COUPLED_THERMAL_ELECTRIC
+    #: - DIRECT_CYCLIC
+    #: - DYNAMIC_IMPLICIT
+    #: - DYNAMIC_EXPLICIT
+    #: - DYNAMIC_SUBSPACE
+    #: - DYNAMIC_TEMP_DISPLACEMENT
+    #: - COUPLED_THERMAL_ELECTRICAL_STRUCTURAL
+    #: - FREQUENCY
+    #: - GEOSTATIC
+    #: - HEAT_TRANSFER
+    #: - MASS_DIFFUSION
+    #: - MODAL_DYNAMICS
+    #: - RANDOM_RESPONSE
+    #: - RESPONSE_SPECTRUM
+    #: - SOILS
+    #: - STATIC_GENERAL
+    #: - STATIC_LINEAR_PERTURBATION
+    #: - STATIC_RIKS
+    #: - STEADY_STATE_DIRECT
+    #: - STEADY_STATE_MODAL
+    #: - STEADY_STATE_SUBSPACE
+    #: - VISCO
+    procedureType: SymbolicConstant
+
+    #: A Boolean specifying whether the step is suppressed or not. The default value is OFF.
+    suppressed: Boolean = OFF
+
+    #: A repository of FieldOutputRequestState objects.
+    fieldOutputRequestState: dict[str, FieldOutputRequestState] = {}
+
+    #: A repository of HistoryOutputRequestState objects.
+    historyOutputRequestState: dict[str, HistoryOutputRequestState] = {}
+
+    #: A DiagnosticPrint object.
+    diagnosticPrint: DiagnosticPrint = DiagnosticPrint()
+
+    #: A Monitor object.
+    monitor: Monitor | None = None
+
+    #: A Restart object.
+    restart: Restart = Restart()
+
+    #: A repository of AdaptiveMeshConstraintState objects.
+    adaptiveMeshConstraintStates: dict[str, AdaptiveMeshConstraintState] = {}
+
+    #: A repository of AdaptiveMeshDomain objects.
+    adaptiveMeshDomains: dict[str, AdaptiveMeshDomain] = {}
+
+    #: A Control object.
+    control: Control = Control()
+
+    #: A SolverControl object.
+    solverControl: SolverControl = SolverControl()
+
+    #: A repository of BoundaryConditionState objects.
+    boundaryConditionStates: dict[str, BoundaryConditionState] = {}
+
+    #: A repository of InteractionState objects.
+    interactionStates: int | None = None
+
+    #: A repository of LoadState objects.
+    loadStates: dict[str, LoadState] = {}
+
+    #: A repository of LoadCase objects.
+    loadCases: dict[str, LoadCase] = {}
+
+    #: A repository of PredefinedFieldState objects.
+    predefinedFieldStates: dict[str, PredefinedFieldState] = {}
+
+    @abaqus_method_doc
+    def __init__(
+        self,
+        name: str,
+        previous: str,
+        description: str = "",
+        nlgeom: Boolean = OFF,
+        matrixSolver: Literal[C.DIRECT, C.ITERATIVE] = DIRECT,
+        matrixStorage: Literal[C.SYMMETRIC, C.SOLVER_DEFAULT, C.UNSYMMETRIC] = SOLVER_DEFAULT,
+        maintainAttributes: Boolean = False,
+        solutionTechnique: Literal[C.QUASI_NEWTON, C.FULL_NEWTON] = FULL_NEWTON,
+        reformKernel: int = 8,
+        convertSDI: Literal[C.CONVERT_SDI_OFF, C.PROPAGATED, C.CONVERT_SDI_ON] = PROPAGATED,
+        utol: float | None = None,
+        timePeriod: float = 1,
+        timeIncrementationMethod: Literal[C.AUTOMATIC, C.FIXED] = AUTOMATIC,
+        maxNumInc: int = 100,
+        initialInc: float | None = None,
+        minInc: float | None = None,
+        maxInc: float | None = None,
+    ):
+        """This method creates a GeostaticStep object.
+
+        .. note::
+            This function can be accessed by::
+
+                mdb.models[name].GeostaticStep
+
+        Parameters
+        ----------
+        name
+            A String specifying the repository key.
+        previous
+            A String specifying the name of the previous step. The new step appears after this step
+            in the list of analysis steps.
+        description
+            A String specifying a description of the new step. The default value is an empty string.
+        nlgeom
+            A Boolean specifying whether geometric nonlinearities should be accounted for during the
+            step. The default value is OFF.
+        matrixSolver
+            A SymbolicConstant specifying the type of solver. Possible values are DIRECT and
+            ITERATIVE. The default value is DIRECT.
+        matrixStorage
+            A SymbolicConstant specifying the type of matrix storage. Possible values are SYMMETRIC,
+            UNSYMMETRIC, and SOLVER_DEFAULT. The default value is SOLVER_DEFAULT.
+        maintainAttributes
+            A Boolean specifying whether to retain attributes from an existing step with the same
+            name. The default value is False.
+        solutionTechnique
+            A SymbolicConstant specifying the technique used to for solving nonlinear equations.
+            Possible values are FULL_NEWTON and QUASI_NEWTON. The default value is FULL_NEWTON.
+        reformKernel
+            An Int specifying the number of quasi-Newton iterations allowed before the kernel matrix
+            is reformed.. The default value is 8.
+        convertSDI
+            A SymbolicConstant specifying whether to force a new iteration if severe discontinuities
+            occur during an iteration. Possible values are PROPAGATED, CONVERT_SDI_OFF, and
+            CONVERT_SDI_ON. The default value is PROPAGATED.
+        utol
+            None or a Float specifying the tolerance for maximum change of displacements. The
+            default value is None.
+        timePeriod
+            A Float specifying the total time period. The default value is 1.0. Note: This parameter
+            is ignored unless **timeIncrementationMethod** = AUTOMATIC.
+        timeIncrementationMethod
+            A SymbolicConstant specifying the time incrementation method to be used. Possible values
+            are FIXED and AUTOMATIC. The default value is AUTOMATIC.
+        maxNumInc
+            An Int specifying the maximum number of increments in a step. The default value is 100.
+
+            .. versionadded:: 2017
+                The ``maxNumInc`` attribute was added to the GeostaticStep class.
+        initialInc
+            A Float specifying the initial time increment. The default value is the total time
+            period for the step. Note: This parameter is ignored unless
+            **timeIncrementationMethod** = AUTOMATIC.
+        minInc
+            A Float specifying the minimum time increment allowed. The default value is the smaller
+            of the suggested initial time increment or 10−5 times the total time period. Note: This
+            parameter is ignored unless **timeIncrementationMethod** = AUTOMATIC.
+        maxInc
+            A Float specifying the maximum time increment allowed. The default value is the total
+            time period for the step. Note: This parameter is ignored unless
+            **timeIncrementationMethod** = AUTOMATIC.
+
+        Returns
+        -------
+        GeostaticStep
+            A GeostaticStep object.
+
+        Raises
+        ------
+        RangeError
+        """
+        super().__init__()
+
+    @abaqus_method_doc
+    def setValues(
+        self,
+        description: str = "",
+        nlgeom: Boolean = OFF,
+        matrixSolver: Literal[C.DIRECT, C.ITERATIVE] = DIRECT,
+        matrixStorage: Literal[C.SYMMETRIC, C.SOLVER_DEFAULT, C.UNSYMMETRIC] = SOLVER_DEFAULT,
+        solutionTechnique: Literal[C.QUASI_NEWTON, C.FULL_NEWTON] = FULL_NEWTON,
+        reformKernel: int = 8,
+        convertSDI: Literal[C.CONVERT_SDI_OFF, C.PROPAGATED, C.CONVERT_SDI_ON] = PROPAGATED,
+        utol: float | None = None,
+        timePeriod: float = 1,
+        timeIncrementationMethod: Literal[C.AUTOMATIC, C.FIXED] = AUTOMATIC,
+        initialInc: float | None = None,
+        minInc: float | None = None,
+        maxInc: float | None = None,
+    ):
+        """This method modifies the GeostaticStep object.
+
+        Parameters
+        ----------
+        description
+            A String specifying a description of the new step. The default value is an empty string.
+        nlgeom
+            A Boolean specifying whether geometric nonlinearities should be accounted for during the
+            step. The default value is OFF.
+        matrixSolver
+            A SymbolicConstant specifying the type of solver. Possible values are DIRECT and
+            ITERATIVE. The default value is DIRECT.
+        matrixStorage
+            A SymbolicConstant specifying the type of matrix storage. Possible values are SYMMETRIC,
+            UNSYMMETRIC, and SOLVER_DEFAULT. The default value is SOLVER_DEFAULT.
+        solutionTechnique
+            A SymbolicConstant specifying the technique used to for solving nonlinear equations.
+            Possible values are FULL_NEWTON and QUASI_NEWTON. The default value is FULL_NEWTON.
+        reformKernel
+            An Int specifying the number of quasi-Newton iterations allowed before the kernel matrix
+            is reformed.. The default value is 8.
+        convertSDI
+            A SymbolicConstant specifying whether to force a new iteration if severe discontinuities
+            occur during an iteration. Possible values are PROPAGATED, CONVERT_SDI_OFF, and
+            CONVERT_SDI_ON. The default value is PROPAGATED.
+        utol
+            None or a Float specifying the tolerance for maximum change of displacements. The
+            default value is None.
+        timePeriod
+            A Float specifying the total time period. The default value is 1.0. Note: This parameter
+            is ignored unless **timeIncrementationMethod** = AUTOMATIC.
+        timeIncrementationMethod
+            A SymbolicConstant specifying the time incrementation method to be used. Possible values
+            are FIXED and AUTOMATIC. The default value is AUTOMATIC.
+        initialInc
+            A Float specifying the initial time increment. The default value is the total time
+            period for the step. Note: This parameter is ignored unless
+            **timeIncrementationMethod** = AUTOMATIC.
+        minInc
+            A Float specifying the minimum time increment allowed. The default value is the smaller
+            of the suggested initial time increment or 10−5 times the total time period. Note: This
+            parameter is ignored unless **timeIncrementationMethod** = AUTOMATIC.
+        maxInc
+            A Float specifying the maximum time increment allowed. The default value is the total
+            time period for the step. Note: This parameter is ignored unless
+            **timeIncrementationMethod** = AUTOMATIC.
+
+        Raises
+        ------
+        RangeError
+        """
+        ...

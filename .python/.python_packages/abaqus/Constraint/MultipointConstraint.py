@@ -1,0 +1,145 @@
+from __future__ import annotations
+
+from typing_extensions import Literal
+
+from abqpy.decorators import abaqus_class_doc, abaqus_method_doc
+
+from ..Region.Region import Region
+from ..UtilityAndView.abaqusConstants import (
+    DOF_MODE_MPC,
+    OFF,
+    Boolean,
+    SymbolicConstant,
+)
+from ..UtilityAndView.abaqusConstants import abaqusConstants as C
+from .Constraint import Constraint
+
+
+@abaqus_class_doc
+class MultipointConstraint(Constraint):
+    """The MultipointConstraint object defines a constraint between a group of MultipointConstraint nodes
+    located on a region and a reference point. The MultipointConstraint object is derived from the
+    ConstrainedSketchConstraint object.
+
+    .. note::
+        This object can be accessed by::
+
+            import interaction
+            mdb.models[name].constraints[name]
+
+        The corresponding analysis keywords are:
+
+        - MPC
+    """
+
+    #: A Boolean specifying whether the constraint is suppressed or not. The default value is
+    #: OFF.
+    suppressed: Boolean = OFF
+
+    #: A String specifying the constraint repository key.
+    name: str
+
+    #: A Region object specifying the surface on which the MultipointConstraint nodes are
+    #: located.
+    surface: Region
+
+    #: A Region object specifying the constraint control point.
+    controlPoint: Region
+
+    #: A SymbolicConstant specifying the MPC type of the constraint. Possible values are
+    #: BEAM_MPC, ELBOW_MPC, PIN_MPC, LINK_MPC, TIE_MPC, and USER_MPC.
+    mpcType: SymbolicConstant
+
+    #: None or a DatumCsys object specifying the initial orientation of the local coordinate
+    #: system for the MultipointConstraint's degrees of freedom. If **localCsys** = None, the
+    #: MultipointConstraint is defined in the global coordinate system. The default value is
+    #: None.
+    csys: str | None = None
+
+    #: An Int specifying to differentiate between different constraint types in a user-defined
+    #: MultipointConstraint. The default value is 0.The **userType** argument applies only when
+    #: **mpcType** = USER_MPC.
+    userType: int = 0
+
+    #: A SymbolicConstant specifying the mode of the constraint when it is user-defined.
+    #: Possible values are DOF_MODE_MPC and NODE_MODE_MPC. The default value is
+    #: DOF_MODE_MPC.The **userMode** argument applies only when **mpcType** = USER_MPC.
+    userMode: SymbolicConstant = DOF_MODE_MPC
+
+    @abaqus_method_doc
+    def __init__(
+        self,
+        name: str,
+        surface: Region,
+        controlPoint: Region,
+        mpcType: Literal[C.USER_MPC, C.BEAM_MPC, C.ELBOW_MPC, C.TIE_MPC, C.MPC, C.PIN_MPC, C.LINK_MPC],
+        csys: str | None = None,
+        userType: int = 0,
+        userMode: Literal[C.DOF_MODE_MPC, C.USER_MPC, C.NODE_MODE_MPC] = DOF_MODE_MPC,
+    ):
+        """This method creates a MultipointConstraint object.
+
+        .. note::
+            This function can be accessed by::
+
+                mdb.models[name].MultipointConstraint
+
+        Parameters
+        ----------
+        name
+            A String specifying the constraint repository key.
+        surface
+            A Region object specifying the surface on which the MultipointConstraint nodes are
+            located.
+        controlPoint
+            A Region object specifying the constraint control point.
+        mpcType
+            A SymbolicConstant specifying the MPC type of the constraint. Possible values are
+            BEAM_MPC, ELBOW_MPC, PIN_MPC, LINK_MPC, TIE_MPC, and USER_MPC.
+        csys
+            None or a DatumCsys object specifying the initial orientation of the local coordinate
+            system for the MultipointConstraint's degrees of freedom. If **localCsys** = None, the
+            MultipointConstraint is defined in the global coordinate system. The default value is
+            None.
+        userType
+            An Int specifying to differentiate between different constraint types in a user-defined
+            MultipointConstraint. The default value is 0.The **userType** argument applies only when
+            **mpcType** = USER_MPC.
+        userMode
+            A SymbolicConstant specifying the mode of the constraint when it is user-defined.
+            Possible values are DOF_MODE_MPC and NODE_MODE_MPC. The default value is
+            DOF_MODE_MPC.The **userMode** argument applies only when **mpcType** = USER_MPC.
+
+        Returns
+        -------
+        MultipointConstraint
+            A MultipointConstraint object.
+        """
+        super().__init__()
+
+    @abaqus_method_doc
+    def setValues(
+        self,
+        csys: str | None = None,
+        userType: int = 0,
+        userMode: Literal[C.DOF_MODE_MPC, C.USER_MPC, C.NODE_MODE_MPC] = DOF_MODE_MPC,
+    ):
+        """This method modifies the MultipointConstraint object.
+
+        Parameters
+        ----------
+        csys
+            None or a DatumCsys object specifying the initial orientation of the local coordinate
+            system for the MultipointConstraint's degrees of freedom. If **localCsys** = None, the
+            MultipointConstraint is defined in the global coordinate system. The default value is
+            None.
+        userType
+            An Int specifying to differentiate between different constraint types in a user-defined
+            MultipointConstraint. The default value is 0.The **userType** argument applies only when
+            **mpcType** = USER_MPC.
+        userMode
+            A SymbolicConstant specifying the mode of the constraint when it is user-defined.
+            Possible values are DOF_MODE_MPC and NODE_MODE_MPC. The default value is
+            DOF_MODE_MPC.The **userMode** argument applies only when **mpcType** = USER_MPC.
+        """
+        ...

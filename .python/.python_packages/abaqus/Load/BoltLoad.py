@@ -1,0 +1,160 @@
+from __future__ import annotations
+
+from typing_extensions import Literal
+
+from abqpy.decorators import abaqus_class_doc, abaqus_method_doc
+
+from ..Datum.DatumAxis import DatumAxis
+from ..Region.Region import Region
+from ..UtilityAndView.abaqusConstants import APPLY_FORCE, UNSET, Boolean
+from ..UtilityAndView.abaqusConstants import abaqusConstants as C
+from .Load import Load
+
+
+@abaqus_class_doc
+class BoltLoad(Load):
+    """The BoltLoad object defines a bolt load. The BoltLoad object is derived from the Load object.
+
+    .. note::
+        This object can be accessed by::
+
+            import load
+            mdb.models[name].loads[name]
+
+        The corresponding analysis keywords are:
+
+        - PRE-TENSION SECTION
+                - NODE
+        - NSET
+    """
+
+    #: A String specifying the load repository key.
+    name: str = ""
+
+    #: A DatumAxis object specifying the orientation of the pre-tension section
+    #: normal. Note: *datumAxis* is required only for Solid and Shell regions; it has no meaning
+    #: for Wire regions.
+    datumAxis: DatumAxis = DatumAxis()
+
+    #: A Region object specifying the region to which the load is applied.
+    region: Region = Region()
+
+    @abaqus_method_doc
+    def __init__(
+        self,
+        name: str,
+        createStepName: str,
+        region: Region,
+        magnitude: float,
+        datumAxis: DatumAxis,
+        boltMethod: Literal[C.APPLY_FORCE, C.ADJUST_LENGTH] = APPLY_FORCE,
+        amplitude: str = UNSET,
+        preTenSecPartLevel: Boolean = False,
+    ):
+        """This method creates a BoltLoad object.
+
+        .. note::
+            This function can be accessed by::
+
+                mdb.models[name].BoltLoad
+
+        Parameters
+        ----------
+        name
+            A String specifying the load repository key.
+        createStepName
+            A String specifying the name of the step in which the load is created. This must be the
+            first analysis step name.
+        region
+            A Region object specifying the region to which the load is applied.
+        magnitude
+            A Float specifying the bolt load magnitude.
+        datumAxis
+            A DatumAxis object specifying the orientation of the pre-tension section normal. Note:
+            **datumAxis** is applicable only for Solid and Shell regions; it has no meaning for Wire
+            regions.
+        boltMethod
+            A SymbolicConstant specifying the method of applying the bolt load. Possible values are
+            APPLY_FORCE and ADJUST_LENGTH. The default value is APPLY_FORCE.
+        amplitude
+            A String or the SymbolicConstant UNSET specifying the name of the amplitude reference.
+            UNSET should be used if the load has no amplitude reference. The default value is UNSET.
+            You should provide the **amplitude** argument only if it is valid for the specified step.
+        preTenSecPartLevel
+            A Boolean specifying whether the pre-tension section is to be defined at the part level.
+            The default value is False. You should provide the **preTenSecPartLevel** argument only if
+            the selected region belongs to a dependent part instance. A pre-tension section cannot
+            be defined at the part level for independent and model instances.
+
+            .. versionadded:: 2018
+                The ``preTenSecPartLevel`` argument was added.
+
+        Returns
+        -------
+        BoltLoad
+            A BoltLoad object.
+
+        Raises
+        ------
+        TextError
+        """
+        super().__init__()
+
+    @abaqus_method_doc
+    def setValues(
+        self,
+        boltMethod: Literal[C.APPLY_FORCE, C.ADJUST_LENGTH] = APPLY_FORCE,
+        datumAxis: DatumAxis | None = None,
+        amplitude: str = UNSET,
+        preTenSecPartLevel: Boolean = False,
+    ):
+        """This method modifies the data for an existing BoltLoad object in the step where it is created.
+
+        Parameters
+        ----------
+        boltMethod
+            A SymbolicConstant specifying the method of applying the bolt load. Possible values are
+            APPLY_FORCE and ADJUST_LENGTH. The default value is APPLY_FORCE.
+        datumAxis
+            A DatumAxis object specifying the orientation of the pre-tension section normal. Note:
+            **datumAxis** is applicable only for Solid and Shell regions; it has no meaning for Wire
+            regions.
+        amplitude
+            A String or the SymbolicConstant UNSET specifying the name of the amplitude reference.
+            UNSET should be used if the load has no amplitude reference. The default value is UNSET.
+            You should provide the **amplitude** argument only if it is valid for the specified step.
+        preTenSecPartLevel
+            A Boolean specifying whether the pre-tension section is to be defined at the part level.
+            The default value is False. You should provide the **preTenSecPartLevel** argument only if
+            the selected region belongs to a dependent part instance. A pre-tension section cannot
+            be defined at the part level for independent and model instances.
+        """
+        ...
+
+    @abaqus_method_doc
+    def setValuesInStep(
+        self,
+        stepName: str,
+        boltMethod: Literal[C.FIX_LENGTH, C.APPLY_FORCE, C.ADJUST_LENGTH] = APPLY_FORCE,
+        magnitude: float | None = None,
+        amplitude: str = "",
+    ):
+        """This method modifies the propagating data for an existing BoltLoad object in the specified step.
+
+        Parameters
+        ----------
+        stepName
+            A String specifying the name of the step in which the load is modified.
+        boltMethod
+            A SymbolicConstant specifying the type of bolt load. Possible values are APPLY_FORCE,
+            ADJUST_LENGTH, and FIX_LENGTH. The default is APPLY_FORCE.
+        magnitude
+            A Float specifying the bolt load magnitude.
+        amplitude
+            A String or a SymbolicConstant specifying the name of the amplitude reference. Possible
+            values for the SymbolicConstant are UNCHANGED and FREED. UNCHANGED should be used if the
+            amplitude is propagated from the previous analysis step. FREED should be used if the
+            load is changed to have no amplitude reference. You should provide the **amplitude**
+            argument only if it is valid for the specified step.
+        """
+        ...
